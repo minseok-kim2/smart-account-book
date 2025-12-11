@@ -1,0 +1,127 @@
+﻿폴더 PATH의 목록입니다.
+볼륨 일련 번호는 C20E-CF50입니다.
+C:.
+│  .classpath
+│  .gitattributes
+│  .gitignore
+│  .project
+│  build.gradle
+│  folder_structure.txt
+│  gradlew
+│  gradlew.bat
+│  HELP.md
+│  jwbook.txt
+│  settings.gradle
+│  
+├─.gradle
+│  ├─8.14.3
+│  │  │  gc.properties
+│  │  │  
+│  │  ├─checksums
+│  │  │      checksums.lock
+│  │  │      md5-checksums.bin
+│  │  │      sha1-checksums.bin
+│  │  │      
+│  │  ├─executionHistory
+│  │  │      executionHistory.lock
+│  │  │      
+│  │  ├─expanded
+│  │  ├─fileChanges
+│  │  │      last-build.bin
+│  │  │      
+│  │  ├─fileHashes
+│  │  │      fileHashes.lock
+│  │  │      
+│  │  └─vcsMetadata
+│  ├─buildOutputCleanup
+│  │      buildOutputCleanup.lock
+│  │      cache.properties
+│  │      
+│  └─vcs-1
+│          gc.properties
+│          
+├─.settings
+│      org.eclipse.buildship.core.prefs
+│      org.eclipse.core.resources.prefs
+│      org.springframework.ide.eclipse.prefs
+│      
+├─bin
+│  ├─main
+│  │  │  application.properties
+│  │  │  
+│  │  ├─kr
+│  │  │  └─ac
+│  │  │      └─shinhan
+│  │  │          │  JwbookApplication.class
+│  │  │          │  Product.class
+│  │  │          │  ProductService.class
+│  │  │          │  
+│  │  │          └─controller
+│  │  │                  CalcController.class
+│  │  │                  CalculatorController.class
+│  │  │                  jstlExamController.class
+│  │  │                  ProductController.class
+│  │  │                  StartController.class
+│  │  │                  
+│  │  └─static
+│  │      │  index.html
+│  │      │  
+│  │      └─ch08
+│  │              calcForm.html
+│  │              
+│  └─test
+│      └─kr
+│          └─ac
+│              └─shinhan
+│                      JwbookApplicationTests.class
+│                      
+├─gradle
+│  └─wrapper
+│          gradle-wrapper.jar
+│          gradle-wrapper.properties
+│          
+└─src
+    ├─main
+    │  ├─java
+    │  │  └─kr
+    │  │      └─ac
+    │  │          └─shinhan
+    │  │              │  JwbookApplication.java
+    │  │              │  Product.java
+    │  │              │  ProductService.java
+    │  │              │  
+    │  │              └─controller
+    │  │                      CalcController.java
+    │  │                      CalculatorController.java
+    │  │                      jstlExamController.java
+    │  │                      ProductController.java
+    │  │                      StartController.java
+    │  │                      
+    │  ├─resources
+    │  │  │  application.properties
+    │  │  │  
+    │  │  └─static
+    │  │      │  index.html
+    │  │      │  
+    │  │      └─ch08
+    │  │              calcForm.html
+    │  │              
+    │  └─webapp
+    │      └─WEB-INF
+    │          └─views
+    │              │  calculator.jsp
+    │              │  jstlExam.jsp
+    │              │  mainStart.jsp
+    │              │  
+    │              └─ch08
+    │                      calcResult.jsp
+    │                      productInfo.jsp
+    │                      productList.jsp
+    │                      
+    └─test
+        └─java
+            └─kr
+                └─ac
+                    └─shinhan
+                            JwbookApplicationTests.java
+                            
