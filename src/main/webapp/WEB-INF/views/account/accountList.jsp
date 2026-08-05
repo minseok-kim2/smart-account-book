@@ -58,32 +58,38 @@
 			</form>
 		</div>
 		
-		<!-- 에러 메시지 -->
+		<!-- 성공/에러 메시지 -->
+		<c:if test="${message != null}">
+			<div class="alert alert-success alert-dismissible fade show">
+				<i class="bi bi-check-circle"></i> ${message}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			</div>
+		</c:if>
 		<c:if test="${error != null}">
 			<div class="alert alert-danger alert-dismissible fade show">
 				<i class="bi bi-exclamation-triangle"></i> ${error}
 				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 			</div>
 		</c:if>
-		
+
 		<!-- 요약 카드 -->
 		<div class="row mb-4">
 			<div class="col-md-4 mb-3">
 				<div class="summary-card income-card">
 					<p><i class="bi bi-arrow-down-circle"></i> 수입</p>
-					<h3><fmt:formatNumber value="${totalIncome}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.totalIncome}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="summary-card expense-card">
 					<p><i class="bi bi-arrow-up-circle"></i> 지출</p>
-					<h3><fmt:formatNumber value="${totalExpense}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.totalExpense}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="summary-card balance-card">
 					<p><i class="bi bi-piggy-bank"></i> 잔액</p>
-					<h3><fmt:formatNumber value="${balance}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.balance}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 		</div>
@@ -134,9 +140,12 @@
 								<a href="/account/edit/${item.id}" class="btn btn-sm btn-outline-primary">
 									<i class="bi bi-pencil"></i>
 								</a>
-								<button class="btn btn-sm btn-outline-danger" onclick="confirmDelete(${item.id})">
-									<i class="bi bi-trash"></i>
-								</button>
+								<form method="post" action="/account/delete/${item.id}" class="d-inline"
+									onsubmit="return confirm('정말 삭제하시겠습니까?');">
+									<button type="submit" class="btn btn-sm btn-outline-danger">
+										<i class="bi bi-trash"></i>
+									</button>
+								</form>
 							</td>
 						</tr>
 					</c:forEach>
@@ -152,14 +161,6 @@
 			</table>
 		</div>
 	</div>
-	
-	<script>
-		function confirmDelete(id) {
-			if (confirm('정말 삭제하시겠습니까?')) {
-				location.href = '/account/delete/' + id;
-			}
-		}
-	</script>
 </body>
 </html>
 

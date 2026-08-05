@@ -16,3 +16,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# DB 자격증명 포함 (application-example.properties 참고)
+src/main/resources/application.properties

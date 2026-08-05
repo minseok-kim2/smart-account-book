@@ -78,19 +78,19 @@
 			<div class="col-md-4 mb-3">
 				<div class="summary-card income-card">
 					<p><i class="bi bi-arrow-down-circle"></i> 총 수입</p>
-					<h3><fmt:formatNumber value="${totalIncome}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.totalIncome}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="summary-card expense-card">
 					<p><i class="bi bi-arrow-up-circle"></i> 총 지출</p>
-					<h3><fmt:formatNumber value="${totalExpense}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.totalExpense}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="summary-card balance-card">
 					<p><i class="bi bi-piggy-bank"></i> 잔액</p>
-					<h3><fmt:formatNumber value="${balance}" pattern="#,###"/>원</h3>
+					<h3><fmt:formatNumber value="${summary.balance}" pattern="#,###"/>원</h3>
 				</div>
 			</div>
 		</div>
@@ -126,8 +126,8 @@
 								</div>
 								<div class="progress mb-3">
 									<div class="progress-bar bg-danger" role="progressbar" 
-										style="width: ${totalExpense > 0 ? (item.total / totalExpense * 100) : 0}%">
-										<fmt:formatNumber value="${totalExpense > 0 ? (item.total / totalExpense * 100) : 0}" pattern="#"/>%
+										style="width: ${summary.totalExpense > 0 ? (item.total / summary.totalExpense * 100) : 0}%">
+										<fmt:formatNumber value="${summary.totalExpense > 0 ? (item.total / summary.totalExpense * 100) : 0}" pattern="#"/>%
 									</div>
 								</div>
 							</c:forEach>
@@ -192,7 +192,7 @@
 		new Chart(monthlyCtx, {
 			type: 'bar',
 			data: {
-				labels: [<c:forEach var="item" items="${monthlyStats}" varStatus="s">'${item.month}'<c:if test="${!s.last}">,</c:if></c:forEach>],
+				labels: [<c:forEach var="item" items="${monthlyStats}" varStatus="s">'${item.yearMonth}'<c:if test="${!s.last}">,</c:if></c:forEach>],
 				datasets: [{
 					label: '수입',
 					data: [<c:forEach var="item" items="${monthlyStats}" varStatus="s">${item.income}<c:if test="${!s.last}">,</c:if></c:forEach>],
