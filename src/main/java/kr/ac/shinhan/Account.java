@@ -1,35 +1,26 @@
 package kr.ac.shinhan;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+
+@Data // getter and Setter Support
 public class Account {
 	private int id;
 	private String type;        // income(수입) / expense(지출)
 	private String category;    // 카테고리
-	private int amount;         // 금액
+	private long amount;        // 금액 (원 단위, int 상한 약 21억을 넘을 수 있어 long 사용)
 	private String description; // 설명
-	private String accountDate; // 거래일자
-	private String createdDate; // 등록일시
-	
-	// Getter & Setter
-	public int getId() { return id; }
-	public void setId(int id) { this.id = id; }
-	
-	public String getType() { return type; }
-	public void setType(String type) { this.type = type; }
-	
-	public String getCategory() { return category; }
-	public void setCategory(String category) { this.category = category; }
-	
-	public int getAmount() { return amount; }
-	public void setAmount(int amount) { this.amount = amount; }
-	
-	public String getDescription() { return description; }
-	public void setDescription(String description) { this.description = description; }
-	
-	public String getAccountDate() { return accountDate; }
-	public void setAccountDate(String accountDate) { this.accountDate = accountDate; }
-	
-	public String getCreatedDate() { return createdDate; }
-	public void setCreatedDate(String createdDate) { this.createdDate = createdDate; }
+
+	// <input type="date"> 가 보내는 ISO(yyyy-MM-dd) 형식 바인딩을 코드로 명시
+	@DateTimeFormat(iso = ISO.DATE)
+	private LocalDate accountDate; // 거래일자
+
+	private LocalDateTime createdDate; // 등록일시
 }
 /*
 CREATE TABLE account (

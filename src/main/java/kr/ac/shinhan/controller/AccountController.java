@@ -1,13 +1,8 @@
 package kr.ac.shinhan.controller;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,136 +11,120 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.ac.shinhan.Account;
-import kr.ac.shinhan.AccountDAO;
+import kr.ac.shinhan.dto.CategorySum;
+import kr.ac.shinhan.dto.MonthlySummary;
+import kr.ac.shinhan.dto.MonthlyTrend;
+import kr.ac.shinhan.service.AccountService;
 
 @Controller
 @RequestMapping("/account")
 public class AccountController {
-	@Autowired
-	private AccountDAO dao;
+	private final AccountService accountService;
+
+	public AccountController(AccountService accountService) {
+		this.accountService = accountService;
+	}
 
 	// 가계부 목록 (월별)
 	@GetMapping
 	public String listAccount(@RequestParam(value = "month", required = false) String month, Model model) {
+		String resolvedMonth = accountService.resolveMonth(month);
 		try {
-			// 월이 지정되지 않으면 현재 월 사용
-			if (month == null || month.isEmpty()) {
-				month = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-			}
-			
-			List<Account> list = dao.getByMonth(month);
-			int totalIncome = dao.getTotalIncomeByMonth(month);
-			int totalExpense = dao.getTotalExpenseByMonth(month);
-			int balance = totalIncome - totalExpense;
-			List<String> availableMonths = dao.getAvailableMonths();
-			
+			List<Account> list = accountService.getByMonth(resolvedMonth);
+			MonthlySummary summary = accountService.getMonthlySummary(resolvedMonth);
+			List<String> availableMonths = accountService.getAvailableMonths();
+
 			model.addAttribute("accountList", list);
-			model.addAttribute("currentMonth", month);
-			model.addAttribute("totalIncome", totalIncome);
-			model.addAttribute("totalExpense", totalExpense);
-			model.addAttribute("balance", balance);
+			model.addAttribute("currentMonth", resolvedMonth);
+			model.addAttribute("summary", summary);
 			model.addAttribute("availableMonths", availableMonths);
 		} catch (Exception e) {
-			model.addAttribute("error", "가계부 목록을 불러오는 데 실패했습니다: " + e.getMessage());
+			// 예외 메시지를 그대로 노출하면 테이블명/SQL 구조가 드러날 수 있어 고정 문구만 표시
+			model.addAttribute("error", "가계부 목록을 불러오는 데 실패했습니다.");
 		}
 		return "account/accountList";
 	}
-	
+
 	// 통계 페이지
 	@GetMapping("/stats")
 	public String showStats(@RequestParam(value = "month", required = false) String month, Model model) {
+		String resolvedMonth = accountService.resolveMonth(month);
 		try {
-			if (month == null || month.isEmpty()) {
-				month = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-			}
-			
-			int totalIncome = dao.getTotalIncomeByMonth(month);
-			int totalExpense = dao.getTotalExpenseByMonth(month);
-			List<Map<String, Object>> expenseByCategory = dao.getExpenseByCategory(month);
-			List<Map<String, Object>> incomeByCategory = dao.getIncomeByCategory(month);
-			List<Map<String, Object>> monthlyStats = dao.getMonthlyStats();
-			List<String> availableMonths = dao.getAvailableMonths();
-			
-			model.addAttribute("currentMonth", month);
-			model.addAttribute("totalIncome", totalIncome);
-			model.addAttribute("totalExpense", totalExpense);
-			model.addAttribute("balance", totalIncome - totalExpense);
+			MonthlySummary summary = accountService.getMonthlySummary(resolvedMonth);
+			List<CategorySum> expenseByCategory = accountService.getExpenseByCategory(resolvedMonth);
+			List<CategorySum> incomeByCategory = accountService.getIncomeByCategory(resolvedMonth);
+			List<MonthlyTrend> monthlyStats = accountService.getMonthlyStats();
+			List<String> availableMonths = accountService.getAvailableMonths();
+
+			model.addAttribute("currentMonth", resolvedMonth);
+			model.addAttribute("summary", summary);
 			model.addAttribute("expenseByCategory", expenseByCategory);
 			model.addAttribute("incomeByCategory", incomeByCategory);
 			model.addAttribute("monthlyStats", monthlyStats);
 			model.addAttribute("availableMonths", availableMonths);
 		} catch (Exception e) {
-			model.addAttribute("error", "통계를 불러오는 데 실패했습니다: " + e.getMessage());
+			model.addAttribute("error", "통계를 불러오는 데 실패했습니다.");
 		}
 		return "account/accountStats";
 	}
-	
+
 	// 등록 폼 (GET)
 	@GetMapping("/write")
 	public String showWriteForm(Model model) {
-		// 오늘 날짜를 기본값으로 설정
 		model.addAttribute("today", LocalDate.now().toString());
 		return "account/accountForm";
 	}
-	
+
 	// 등록 처리 (POST)
 	@PostMapping("/write")
-	public String addAccount(@ModelAttribute Account account) {
+	public String addAccount(@ModelAttribute Account account, RedirectAttributes redirectAttributes) {
 		try {
-			dao.addAccount(account);
+			accountService.addAccount(account);
+			redirectAttributes.addFlashAttribute("message", "등록되었습니다.");
 		} catch (Exception e) {
-			String errorMsg = URLEncoder.encode("등록 실패: " + e.getMessage(), StandardCharsets.UTF_8);
-			return "redirect:/account?error=" + errorMsg;
+			redirectAttributes.addFlashAttribute("error", "등록 실패");
 		}
 		return "redirect:/account";
 	}
-	
+
 	// 수정 폼 (GET)
 	@GetMapping("/edit/{id}")
-	public String showEditForm(@PathVariable("id") int id, Model model) {
-		try {
-			Account account = dao.getAccount(id);
-			if (account == null) {
-				String errorMsg = URLEncoder.encode("해당 내역을 찾을 수 없습니다", StandardCharsets.UTF_8);
-				return "redirect:/account?error=" + errorMsg;
-			}
-			model.addAttribute("account", account);
-		} catch (Exception e) {
-			String errorMsg = URLEncoder.encode("내역을 찾을 수 없습니다", StandardCharsets.UTF_8);
-			return "redirect:/account?error=" + errorMsg;
+	public String showEditForm(@PathVariable("id") int id, Model model, RedirectAttributes redirectAttributes) {
+		Account account = accountService.getAccount(id);
+		if (account == null) {
+			redirectAttributes.addFlashAttribute("error", "해당 내역을 찾을 수 없습니다.");
+			return "redirect:/account";
 		}
+		model.addAttribute("account", account);
 		return "account/accountEdit";
 	}
-	
+
 	// 수정 처리 (POST)
 	@PostMapping("/edit")
-	public String updateAccount(@ModelAttribute Account account) {
+	public String updateAccount(@ModelAttribute Account account, RedirectAttributes redirectAttributes) {
 		try {
-			dao.updateAccount(account);
+			accountService.modifyAccount(account);
+			redirectAttributes.addFlashAttribute("message", "수정되었습니다.");
 		} catch (Exception e) {
-			String errorMsg = URLEncoder.encode("수정 실패", StandardCharsets.UTF_8);
-			return "redirect:/account?error=" + errorMsg;
+			redirectAttributes.addFlashAttribute("error", "수정 실패");
 		}
 		return "redirect:/account";
 	}
-	
+
 	// 삭제
-	@GetMapping("/delete/{id}")
-	public String deleteAccount(@PathVariable("id") int id) {
+	// GET 은 서버 상태를 바꾸지 않는다는 HTTP 규약이 있다. GET 으로 삭제를 구현하면
+	// 크롤러, 링크 미리보기, 브라우저 프리페치가 URL 에 접근하는 것만으로 데이터가 지워질 수 있어 POST 로 변경.
+	@PostMapping("/delete/{id}")
+	public String deleteAccount(@PathVariable("id") int id, RedirectAttributes redirectAttributes) {
 		try {
-			dao.deleteAccount(id);
+			accountService.removeAccount(id);
+			redirectAttributes.addFlashAttribute("message", "삭제되었습니다.");
 		} catch (Exception e) {
-			String errorMsg = URLEncoder.encode("삭제 실패", StandardCharsets.UTF_8);
-			return "redirect:/account?error=" + errorMsg;
+			redirectAttributes.addFlashAttribute("error", "삭제 실패");
 		}
 		return "redirect:/account";
 	}
 }
-
-
-
-
-
-
